@@ -1,0 +1,5 @@
+Encara que els creadors de les classes siguen els que figuren a la llista d'abaix, tots ens hem ajudat entre tots, hem debugat codi conjuntament i hem ajudat a dissenyar tant la capa de domini com les capes visuals i de persistencia.
+Sergi: PPM.jar,JPGFile.java JPGAlgorithm.java, AppList.jar, HTree.jar, CtrlPersistencia.java, Chunk.java
+Arnau: TXT.java, LZ78file.java, LZ78.java, CarpetaVisual, ComprimirVisual, DestiVisual, EstadistiquesVisual, FitxerVisual, ManualComprimirVisual, MostrarEstadistiques, ObrirVisual, QualitatJPEGVisual, SeleccionarArxiusComprimir, VisualPresentacioCtrlPresentacio.java
+Efren: No_comprimit.java, LZSS.java, LZSSFile.jar, Compressedfolder.java, DiskIO.java, Estadistiques.java, Carpeta.java, 
+Joan Manel:  LZWTest.java, LZW.java, LZWfile.java, Comprimit.java, Algorithm.java, AlgorithmStrategy.jar, CtrlDominiComprimir.java, CtrlDominiDescomprimir.java, CtrlDominiObrir.java, CtrlEstadistiques.java, 

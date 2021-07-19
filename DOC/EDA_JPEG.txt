@@ -1,0 +1,69 @@
+Funcionament del algoritme JPEG:
+
+La compressio JPEG consta de diversos passos:------------------------------------------------------------------------------------------------------------------------------------------
+1-Conversio al espai de color YCbCr
+2-Downsapmpling (no te perque fer-se sempre) Difumina lleugerament els colors de cada pixel amb els colors dels seus veins per evitar canvis bruscos de color, que es el que pitjor comprimeix JPEG
+3-Agrupacio dels pixels en blocs de 8x8
+4-Centrar els valors al voltant de 0, els valors originals que podriem obtenir despres de passar al espai YCbCr van de 0 a 255, pero per al proxim pas els necessitem centrats a 0 aixi que restem 128 de tots els valors de la imatge
+5-DiscreteCosineTransform, busquem quina combinacio lineal de cosinus de diferentes frequencies pot recrear millor cada bloc de 8x8, com els blocs de 8x8 son molt petits majoritariament trobarem cosinus de baixes frequencies especialment si hem aplicat downsampling
+6-Aplicar taules de quantitzacio, dividim tots els valors de cada bloc de 8x8 per els valors que dicten les taules de quantitzacio JPEG, utilitzem taules diferents per a Y que per Cb i Cr ja que l'ull huma es mes sensible al canal Y i per tant no volem reduir-lo tant. Aquestes taules intenten reduir molt mes els cosinus d'altes frequencies ja que son mes dificils de percebre.
+7-Codificacio Huffman, degut a que amb el DCT trobarem sobretot frequencies baixes i que amb les taules de quantitzacio reduim encara mes les senyals d'altes frequencies els quocients d'aquestes seran en gran part 0 i per tant podrem codificar-los amb Huffman de forma molt eficient.
+
+
+Desicions de disseny:----------------------------------------------------------------------------------------------------------------------------
+He implementat tres classes noves per ajudar-me amb la compressio: 
+	-La classe chunk que representa cada grup de 8x8 pixels i es on aplico DCT, aplico les taules de quantitzacio i la majoria d'operacions
+	-La classe AppList que implementa una llista que compta el nombre d'aparicions de cada element, l'explicare en mes detall a continuacio.
+	-La classe HTree que implementa un arbre de Huffman, tambe l'explicare en mes detall a continuacio.
+
+La classe AppList--------------------------------------------------------------------------------------------------------------------------------------------------
+
+La classe AppList implementa una llista que compta el nombre de cops que apareix cada numero en tot el fitxer per mes tard generar un arbre de huffman
+El metode principal de la classe es seen(i) on se li indica que s'ha trobat un nombre "i" i aquesta l'afegeix a la llista o n'augmenta el nombre d'aparicions en 1,
+d'aquesta manera despres de recorrer tota la imatge puc saber quins nombres apareixen a la imatge i quantes vegades, a mes a mes sempre mante tots els elements ordenats
+segons el seu nombre d'aparicions en nombre decreixent i per tant getV(0) sempre retornara el valor que te mes aparicions
+
+La classe HTree-------------------------------------------------------------------------------------------------------------------------------------------
+
+La classe HTree implementa un arbre de huffman i em serveix tant per trobar una el codi corresponent a cada numero com per poder llegir despres el fitxer comprimit.
+Per llegir un comprimit utilitzo els metodes move() i get(), el metode move visita el fill de la dreta o de l'esquerra del node on es troba actualment segons si el parametre
+que se li passa (un boolea) es cert o fals i retorna cert o fals per indicar si s'ha arribat a una fulla o no despres del moviment la funcio get() retorna el valor del node
+actual i torna a l'arrel de l'arbre per tornar a baixar fins a una altra fulla amb move(). D'aquesta manera puc llegir un fitxer comprimit bit a bit i saber sempre quan arribo
+a l'ultim bit de la representacio d'un numero.
+
+
+Decisions preses per arribar a la primera entrega--------------------------------------------------------------------------------------------------------
+-Actualment la lectura de fitxers .ppm es molt poc flexible, sols llegeix fitxers ppm P6, alguns caracters causen errors de lectura i esta programat perque pugui llegir els .ppm que genera el programa gimp, de cara a la segona entrega l'algoritme de lectura sera molt mes flexible.
+
+-Actualment la compressio te molt mala qualitat, per una banda perque no s'ha implementat cap tipus de downsampling i per altra banda perque les taules de quantitzacio que utilitzo redueixen molt la qualitat, de cara a la segona entrega implementare un selector de qualitat i si el temps m'ho permet una funcio de downsampling.
+
+-Actualment s'utilitzen strings en una part de l'algoritme que el fan molt ineficient quan tractem imatges mitjanes o grans, de cara a la segona entrega intentare utilitzar una array de bytes que agilitzara molt el proces.
+
+Millores respecte la primera entrega-------------------------------------------------------------------------------------------------------------------------------------------------------
+-La lectura de fitxers .ppm Pot llegir fitxers P6 i P3, amb comentaris o sense i amb salts de linia de mes o de menys. Aixo ha fet que el proces de lectura sigui mes lent que abans pero per fitxers relativament grans (6Mb) no supera els 0.2s
+
+-L'algoritme ara permet seleccionar la qualitat en una escala de l'1 al 10, i implementa downsampling tot i que per alguna rao aquest ultim practicament no ha tingut cap efecte en el tamany del fitxer comprimit, les qualitats mes altes tenen un factor de compressio 0.8-0.9 pero les mes baixes arriben al 0.3 conservant encara una imatge bastant nitida, al descomprimir els factors de compressio seran mes reduits ja que per comoditat escric els ppm en format P3 i acostumen a pesar mes.
+
+-He substituït els strings per stringbuilder que es una classe que es pot redimensonar dinamicament i per tant es molt mes eficient, per altra banda he modificat gran part del codi perque s'executi de forma paralela en diversos threads i en algunes maquines els temps de compressio ronden els 3 segons per imatges de 2000000 de pixels.
+
+Fonts d'informacio--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Majoritariament he tret la informacio de wikipedia, una serie de tres videos que vaig trobar a youtube i un parell de pagines mes
+
+Video1: 	https://www.youtube.com/watch?v=LFXN9PiOGtY
+Video2: 	https://www.youtube.com/watch?v=n_uNPbdenRs&t=
+Video3: 	https://www.youtube.com/watch?v=Q2aEzeMDHMA&t=
+Wikipedia: 	https://es.wikipedia.org/wiki/Joint_Photographic_Experts_Group
+		http://pi.math.cornell.edu/~web6140/TopTenAlgorithms/JPEG.html
+		https://es.mathworks.com/help/images/discrete-cosine-transform.html
+
+-Resultats JP:
+Per alguna rao alguns programes d'edicio d'imatges com libre office draw no llegeixen be alguns tipus de ppm, incloent els ppm que genera el meu algoritme. Si hi ha dificultats per obrir el fitxer en algun programa en concret, recomano utilitzar gimp.
+
+JP-canvis: En aquest joc de proves hi ha canvis de color molt sobtats, en els quadres aquests pintats de color es passa de valors rgb 0 a 255, cosa que jpeg no pot tractar massa be i la imatge queda bastant distorsionada, tot i que augmentant la qualitat es pot disminuir una mica l'impacte. He provat de comprimir la mateixa imatge en gimp i aquest efecte apenes es nota, imagino que hi ha metodes mes complexos per evitar aquestes situacions pero no he sigut capaç d'arreglar-ho.
+
+JP-gran: En aquest joc de proves comprimeixo una imatge bastant gran per comprovar l'eficiència del programa, en la meva maquina el temps de lectura + temps de compressio + temps d'escriptura ronda els 3 segons.
+
+JP-granP3: En aquest joc de proves comprimeixo una imatge ppm en format P3 per comprovar que es llegeix be, com aquest fitxer pesa molt mes, el temps de lectura retrasa una mica l'execucio.
+
+JP-header: En aquest joc de proves, he borrat uns quants comentaris i salts de linia a la capçalera del fitxer per comprovar que encara es pot llegir be.
+

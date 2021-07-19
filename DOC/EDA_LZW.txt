@@ -1,0 +1,69 @@
+
+Descripcio de l’algorisme
+
+LZW (Lempel-Ziv-Welch) es un algorisme de compressió sense pèrdua, desenvolupat per Terry Welch el 1984 com una versió millorada de l'algorisme LZ78, desenvolupat per Abraham Lempel i Jacob Ziv.
+
+Aquest algorisme es crea dinamicament i amb una passada sobre el text. Per a fer-ho se li inicialitza amb un diccionari amb els caracters que conte el text a comprimir, aquests caracters se’ls hi assigna un codi. 
+
+Aqui tenim un pseudocodi de l’algorisme de compresio de LZW.
+
+w = NULL
+MIENTRAS (!EOF)
+...LEER K
+...SI (wK está en el diccionario) ENTONCES
+......w=wK
+...SINO
+......Imprimir el código de w
+......Agregar wK al diccionario
+......w=K
+...FIN_SI
+FIN_MIENTRAS
+Imprimir el código de w
+
+Amb aquest exemple es pot veure mes clar com funciona l’alogorisme. Aquest va comprovant si el caracter llegit concatenat amb l’anterior caracter o cadena de caracters  esta dins del diccionari, si ho esta, es guardara en una variable la unio d’aquests caracters. Aixi continuara el proces i mentres existeixi la concanetacio al diccionari, i en quan no existeixi s’afegira aquest conjunt de caracters com a entrada al diccionari i se li assignara un codi. A mes a mes en el SINO s’imprimira el codig que li correspondria a aquesta unio de caracters, per aquesta rao es un algorisme dinamic, ja que anira imprimint o guardant els codis(que serviran per descomprimir) mentres va fent l’algorisme.
+
+LZW el que es busca és la cadena més llarga possible. Si el caràcter llegit no forma part de més d'una cadena més llarga, llavors s'emet la més llarga que s'hagués trobat i s'agrega al diccionari una entrada formada per qualsevol que hagués estat el codi previ i aquest nou codi
+
+Aquest seria un preudocodi de l’algorisme de descompresio de LZW
+
+LEER cód_viejo
+carácter=Traducir(cód_viejo)
+Imprimir carácter
+MIENTRAS (!EOF)
+...LEER cód_nuevo
+...SI (cód_nuevo no está en el diccionario) ENTONCES
+......cadena=Traducir(cód_viejo)
+......cadena=cadena+caracter
+...SINO
+......cadena=Traducir(cód_nuevo)
+...FIN_SI
+...Imprimir cadena
+...carácter=Primer carácter de cadena
+...Agregar Traducir(cód_viejo)+carácter al diccionario
+...cód_viejo=cód_nuevo
+FIN_MIENTRAS
+
+Necessita poder agafar la llista de codis de sortida de l'algoritme de compressio i la taula
+inicial dels indexs de caracters individuals. A partir d'aquestes dades, l'algoritme de
+descompressio es capaç de reconstruir completament la taula de cadenes, necessaria
+per poder obtenir l'entrada.  Com veiem aquest anira omplint un buffer amb els caracters  que vagi traduint del diccionari, en cas que una concanetacio no la trobi, la guardara al diccionari. D’aquesta manera el diccionari quedara igual que el diccionari de comprimir.
+
+Decisions
+
+Els diccionaris els he inicialitzat amb tot els caracters ascii, iterant del 0 al 255 i afegint-li el valor de la iteracio com a codi a cada caracter.
+
+Per a fer la concanetacio de caracters ho he guardat en un string, ja que trobava que era la manera mes facil per despres buscarlo al diccionari, enlloc de fer un buffer.
+
+Per els diccionaris he fet servir  es un HashMap de <Integer,String> (en el cas de descomprimir) i de <String,Integer> (en el cas de comprimir). El fet d'utilitzar un hashmap es degut a la seva alta eficiencia en operacions de busqueda-inserció, que es el que fa constantment LZW. A més a més el HashMap de descomprimir es de <Integer,String> ja que tradueixes un codi(numero) a string, per aquest rao es mes facil fer un get del numero per a que et retorni l’string. En el comprimir es al reves, tu llegeixes string i a partir d’aqui vols la traduccio a codi.
+
+Per al conjunt d’integers he fet servir  un array d’integers ja que em facilita l’analisi d’aquests per a iterar sobre ells,o per guardar-los a la sortida.
+
+Problemes
+
+L’algorisme funciona a la perfeccio. Pero el problema mes gran ha sigut a l’hora de guardar el conjunt d’integers en un fitxer. Al principi em vaig adonar que si guardava els integers tal cual, com un integer ocupa 32 bits en la majoria de casos em sortia el tamany del comprimit molt mes gran que el tamany del txt. Llavors vaig decidir passar-ho a chars tot quan feia el write, ja que a java un char es codifica amb 16 bits. No podia agafar un byte ja que el diccionari s’inicialitzava amb tamany 255 per tant a la que es guardava una cadena nova al diccionari es guardava amb un numero major a 255 el qual ja no es pot codificar amb 1 byte. Al fer el write char no m’escrivia be el char, quan era major a 255 m’escrivia un ilegal char el qual no podia ser traduit be per la descompresio. Al final vaig decidir fer un write short i amb aquest em funcionava be, ja que un short tambe es codifica amb 16 bits. Pero aqui vaig descobrir dos  inconvenients: 
+
+-Nomes podria guardar concanetacions al diccionari fins al valor 65.536 ja que es el maxim que es pot codificar amb 16 bits (veure joc de proves Major 65536)
+
+-Estava codificant tot amb 16 bits per tant els caracters que es podien codificar amb 8 bits ara ocupaven el doble
+
+Crec que aquests dos inconvenients son acceptables. Per el segon inconvenient he pensat per la segona entrega potser afegir cada 8 numeros un byte on cada bit fagi referencia a un dels anteriors integers i que digui si s’ha coficiat amb 8 bits o amb 16. D’aquesta manera podria pagar el preu d’afegir un byte mes cada 8 numeros pero m’estalviaria la codificacio innecesaria de 16 bits al caracters que es poden coficiar amb 8.
