@@ -1,0 +1,5 @@
+1-No hem fet estadistiques complexes mes enlla de temps de compresió, tamany i factor de compresio degut a falta de temps.
+2-Hem decidit que en compresio semiautomatica no es pot seleccionar l'algoritme de forma manual a les subcarpetes dintre de la carpeta (si aquestes existeixen)
+3-Per a la funcio Obrir fitxer comprimit, per a facilitar les coses hem decidit no mostrar els fitxers a obrir per la interficie, sino utilitzar una comanda de java que obri un fitxer amb el programa per defecte del sistema, aixi es mes multiplataforma i mes eficient.
+4-La funcio Obrir descomprimexi un fitxer temporalment i despres de visualitzarlo l'esborra, al final però, encara que la capa de persistencia es capas de esborrar un fitxer (te la funcio implementada), hem prescindit d'implementar el mecanisme d'esborrat despres d'obrir-lo.
+5-Hem decidit que el metode automatic no utilitze mai l'algorisme LZ78, no perque aquest no funcione, sino perque la implementacio que tenim d'ell mol poc eficient pel que fa al temps utilitzat.

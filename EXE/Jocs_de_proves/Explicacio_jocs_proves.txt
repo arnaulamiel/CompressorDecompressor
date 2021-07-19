@@ -1,0 +1,47 @@
+joc_prova_text_Llarg: L'objectiu d'aquest joc de prova es l'avaluació del process de compresio i descompresio d'un text llarg amb L'agorisme LZSS ja que aquest es normalment utilitzat en textes considerablement llargs
+
+joc_prova_repeticions: L'objectiu d'aquest joc de prova es evaluar si el fet de l'aparició de moltes repeticions en un text (algo teoricament bo) afecta negativament a l'algoritme
+
+joc_prova_mateixa_lletra: L'objectiu d'aquest joc de proba es evaluar si el fet de que un text nomes contingui un caracter afecta d'alguna forma negativa a la compresió, ja que si nomes hi ha un caracter, aixo implica que l'algorisme es trova en fase de trobada coincidencia de forma constant, una situacio que pot originar problemes
+
+joc_prova_buit: L'objectiu d'aquest joc de prova es testejar si hi ha un error, sobretot a l'hora de llegir i escriure de disc, si es proporciona al programa un fitxer buit.
+
+JP-canvis: En aquest joc de proves hi ha canvis de color molt sobtats, en els quadres aquests pintats de color es passa de valors rgb 0 a 255, cosa que jpeg no pot tractar massa be i la imatge queda bastant distorsionada, tot i que augmentant la qualitat es pot disminuir una mica l'impacte. He provat de comprimir la mateixa imatge en gimp i aquest efecte apenes es nota, imagino que hi ha metodes mes complexos per evitar aquestes situacions pero no he sigut capaç d'arreglar-ho.
+
+JP-gran: En aquest joc de proves comprimeixo una imatge bastant gran per comprovar l'eficiència del programa, en la meva maquina el temps de lectura + temps de compressio + temps d'escriptura ronda els 3 segons.
+
+JP-granP3: En aquest joc de proves comprimeixo una imatge ppm en format P3 per comprovar que es llegeix be, com aquest fitxer pesa molt mes, el temps de lectura retrasa una mica l'execucio.
+
+JP-header: En aquest joc de proves, he borrat uns quants comentaris i salts de linia a la capçalera del fitxer per comprovar que encara es pot llegir be.
+
+Joc_proves_carpeta: Aquest joc de proves es un test per a comprovar que efectivament el programa es capas de comprimir una carpeta i escriure-la a un sol fitxer .cpt
+
+Joc_proves_subcarpeta: Aquest joc de proves es un test per comprovar que el programa es capaç de comprimir una carpeta la qual conté subcarpetes.
+
+Buit.txt Un cas extrem que s'ha de testejar sempre. En cas que s'introdueixi un txt buit el programa t'avisara i tornarà a preguntar-te si vols comprimir o descomprimir
+
+Char_No_Rep.txtUna prova interesant, LZW com ja ha sigut explicat en la documentacio, 	es efectiu quan hi han cadenes de caracters repetides, pero en aquest cas les cadenes de 
+caracters del txt no es repeteixen mai, el que fa que el comprimit acabi pesant mes que el no comprimit (la rao esta explicada a la documentacio). Encara aixi el joc de 
+prova no falla, el descomprimit final es igual que el comprimit inicial. Encara aixi es interessant veure que no es una compresio efectiva. A mes a mes he aprofitat i he
+afegit alguns caracters amb accents, per comprovar que funcionen
+
+CURT.txt Un text curt estandard, la compresio i descompresio es exitosa pero no efectiva.
+
+
+JocDeParaules_1.txt JocDeParaules_2.txt JocDeParaules_3.txt JocDeParaules_4.txt JocDeParaules_5.txt JocDeParaules_6.txt
+
+Son txts curts pero amb repeticions, la compresio i descompresio es exitosa. Son per provar que LZW es capaç de comprimir i descomprimir textos amb repeticions notables
+i de diferents tipus. Encara aixi la compresio segueix sense ser efectiva ja que el comprimit pesa una mica mes que el txt.
+
+Llarg.txt Com vaig veure que LZW funcionava amb tots els casos pero en els casos curts no era efectiva la compresio, vaig decidir provar amb un txt de 100kb, que, evidentment, 
+tindria cadenes de caracters repetits. Vaig decidir provar amb un tan llarg, per veure com era de efectiva la compresio, per veure el temps de descompresio i compresio 
+(si era molt lent) i per veure si funcionava l'algorisme amb txt tan llarg. El comprimir tarda molt poc i es capaç de comprimir els 100 kb a 30 kb. El descomprimir tarda
+una mica mes, pero descomprimeix a la perfeccio. Ha sigut un cas amb molt exit, el cual mostra les qualitats del LZW.
+
+
+Repeticio_extrema.txt Vaig decidir portar un cas de repeticions a l'extrem, forçant les aptituds del LZW per a trobar un bug o un compresio increible. Aquest txt pesa 2330 kb i es un conjunt de
+repeticions de "hola". La compresio es un exit, el comprimit nomes ocupa 10KB, i el descomprimit es fa a la perfeccio. Els temps son una mica mes elevats de lo normal,
+pero es raonable
+
+
+Major 65536.txt Un diccionari es capaç de guardar totes les concanetacions possibles que trobi en un txt per tant en un text molt llarg pot ser que guardi valors major a 65536. El problema ve quan els integers s’han de guardar com a shorts dins del fitxer ja que si no no es produiria una compresio de tamany. Per aquesta rao vaig buscar el cas extrem on el diccionari guardes mes de 65536 conjunts de cadenes diferents,concretament, 82336. El resultat va ser l’esperat, com s’escriu un integer a short i es mes gran que el maxim fa que el diccionari s'esborri del tot, s'inicialitzi novament amb els 256 codis inicials més el codi de fi d'arxiu i es reprengui el procés. Per aquesta rao no es el mateix el fitxer txt d’entrada que el fitxer txt sortida despres d’haver-lo comprimit i descomprimit.
